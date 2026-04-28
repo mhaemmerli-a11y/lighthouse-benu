@@ -1,9 +1,12 @@
-name: Daily Lighthouse Test BENU
+name: Daily Lighthouse Test
 
 on:
   schedule:
     - cron: '0 12 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   lighthouse:
@@ -33,42 +36,42 @@ jobs:
       - name: Install Lighthouse
         run: npm install -g lighthouse
 
-      - name: Run Lighthouse – ${{ matrix.name }}
+      - name: Run Lighthouse
         run: |
           lighthouse "${{ matrix.url }}" \
-            --output html --output json \
+            --output json \
             --output-path ./lighthouse-report \
             --chrome-flags="--headless --no-sandbox" \
             --quiet
 
-      - name: Scores auslesen
-        id: scores
+      - name: Score in results.json schreiben
         run: |
+          DATE=$(date +'%Y-%m-%d')
           PERF=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['performance']['score']*100))")
           ACC=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['accessibility']['score']*100))")
           SEO=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['seo']['score']*100))")
           BP=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['best-practices']['score']*100))")
-          echo "performance=$PERF" >> $GITHUB_OUTPUT
-          echo "accessibility=$ACC" >> $GITHUB_OUTPUT
-          echo "seo=$SEO" >> $GITHUB_OUTPUT
-          echo "best_practices=$BP" >> $GITHUB_OUTPUT
 
-      - name: Job Summary schreiben
+          python3 - <<EOF
+          import json
+          with open("docs/results.json") as f:
+              data = json.load(f)
+          data.append({
+              "date": "$DATE",
+              "page": "${{ matrix.name }}",
+              "performance": $PERF,
+              "accessibility": $ACC,
+              "seo": $SEO,
+              "best_practices": $BP
+          })
+          with open("docs/results.json", "w") as f:
+              json.dump(data, f, indent=2)
+          EOF
+
+      - name: Commit results
         run: |
-          echo "## 🔦 ${{ matrix.name }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`${{ matrix.url }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Kategorie | Score |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Performance | ${{ steps.scores.outputs.performance }}/100 |" >> $GITHUB_STEP_SUMMARY
-          echo "| ♿ Accessibility | ${{ steps.scores.outputs.accessibility }}/100 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 SEO | ${{ steps.scores.outputs.seo }}/100 |" >> $GITHUB_STEP_SUMMARY
-          echo "| ✅ Best Practices | ${{ steps.scores.outputs.best_practices }}/100 |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-      - name: HTML Report speichern
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-${{ matrix.name }}-${{ github.run_number }}
-          path: lighthouse-report.report.html
-          retention-days: 30
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/results.json
+          git commit -m "Lighthouse scores ${{ matrix.name }} $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
+          git push
