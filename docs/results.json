@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "date": "2026-04-28",
+    "page": "Pharmacy",
+    "performance": 22,
+    "accessibility": 80,
+    "seo": 92,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-04-28",
+    "page": "Home",
+    "performance": 25,
+    "accessibility": 91,
+    "seo": 92,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-04-28",
+    "page": "Editorial",
+    "performance": 37,
+    "accessibility": 90,
+    "seo": 85,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-04-28",
+    "page": "PDP",
+    "performance": 40,
+    "accessibility": 87,
+    "seo": 92,
+    "best_practices": 75
+  },
+  {
+    "date": "2026-04-28",
+    "page": "Category",
+    "performance": 61,
+    "accessibility": 91,
+    "seo": 92,
+    "best_practices": 75
+  }
+]
