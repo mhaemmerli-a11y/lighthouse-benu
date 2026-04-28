@@ -8,6 +8,20 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Home
+            url: https://www.benu.ch/
+          - name: Editorial
+            url: https://www.benu.ch/e/flohsamen-das-kleine-wundermittel-mit-grosser-wirkung
+          - name: Pharmacy
+            url: https://www.benu.ch/p/benu-luzern-bahnhof
+          - name: PDP
+            url: https://www.benu.ch/sulgan-n-salbe-50-g
+          - name: Category
+            url: https://www.benu.ch/c/gesundheit/
+
     steps:
       - uses: actions/checkout@v4
 
@@ -19,9 +33,9 @@ jobs:
       - name: Install Lighthouse
         run: npm install -g lighthouse
 
-      - name: Run Lighthouse
+      - name: Run Lighthouse – ${{ matrix.name }}
         run: |
-          lighthouse https://www.benu.ch \
+          lighthouse "${{ matrix.url }}" \
             --output html --output json \
             --output-path ./lighthouse-report \
             --chrome-flags="--headless --no-sandbox" \
@@ -41,8 +55,8 @@ jobs:
 
       - name: Job Summary schreiben
         run: |
-          echo "# 🔦 Lighthouse Report – benu.ch" >> $GITHUB_STEP_SUMMARY
-          echo "**Datum:** $(date +'%d.%m.%Y %H:%M')" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔦 ${{ matrix.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`${{ matrix.url }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Kategorie | Score |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
@@ -50,10 +64,11 @@ jobs:
           echo "| ♿ Accessibility | ${{ steps.scores.outputs.accessibility }}/100 |" >> $GITHUB_STEP_SUMMARY
           echo "| 🔍 SEO | ${{ steps.scores.outputs.seo }}/100 |" >> $GITHUB_STEP_SUMMARY
           echo "| ✅ Best Practices | ${{ steps.scores.outputs.best_practices }}/100 |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
       - name: HTML Report speichern
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-report-${{ github.run_number }}
+          name: lighthouse-${{ matrix.name }}-${{ github.run_number }}
           path: lighthouse-report.report.html
           retention-days: 30
