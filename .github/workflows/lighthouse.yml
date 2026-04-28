@@ -1,0 +1,20 @@
+name: Daily Lighthouse Test
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 13:00 Schweizer Zeit (UTC+1)
+  workflow_dispatch:        # Erlaubt manuelles Starten per Knopfdruck
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://www.benu.ch
+          uploadArtifacts: true
+          temporaryPublicStorage: true
