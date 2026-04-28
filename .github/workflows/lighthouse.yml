@@ -52,10 +52,10 @@ jobs:
       - name: Score als Artifact speichern
         run: |
           DATE=$(date +'%Y-%m-%d')
-          PERF=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['performance']['score']*100))")
-          ACC=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['accessibility']['score']*100))")
-          SEO=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['seo']['score']*100))")
-          BP=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['best-practices']['score']*100))")
+          PERF=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['performance']['score']*100))")
+          ACC=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['accessibility']['score']*100))")
+          SEO=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['seo']['score']*100))")
+          BP=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['best-practices']['score']*100))")
 
           echo "{\"date\":\"$DATE\",\"page\":\"${{ matrix.name }}\",\"performance\":$PERF,\"accessibility\":$ACC,\"seo\":$SEO,\"best_practices\":$BP}" > score-${{ matrix.name }}.json
 
