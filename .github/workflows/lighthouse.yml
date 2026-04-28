@@ -1,4 +1,4 @@
-name: Daily Lighthouse Test
+name: Daily Lighthouse Test BENU
 
 on:
   schedule:
