@@ -12,6 +12,7 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false  # Ein Fehler bricht nicht alle anderen ab
       matrix:
         include:
           - name: Home
@@ -44,7 +45,7 @@ jobs:
             --chrome-flags="--headless --no-sandbox" \
             --quiet
 
-      - name: Score in results.json schreiben
+      - name: Score als Artifact speichern
         run: |
           DATE=$(date +'%Y-%m-%d')
           PERF=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['performance']['score']*100))")
@@ -52,26 +53,53 @@ jobs:
           SEO=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['seo']['score']*100))")
           BP=$(python3 -c "import json; d=json.load(open('lighthouse-report.report.json')); print(int(d['categories']['best-practices']['score']*100))")
 
+          echo "{\"date\":\"$DATE\",\"page\":\"${{ matrix.name }}\",\"performance\":$PERF,\"accessibility\":$ACC,\"seo\":$SEO,\"best_practices\":$BP}" > score-${{ matrix.name }}.json
+
+      - name: Artifact hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: score-${{ matrix.name }}
+          path: score-${{ matrix.name }}.json
+
+  update-results:
+    runs-on: ubuntu-latest
+    needs: lighthouse  # Wartet bis ALLE Lighthouse-Jobs fertig sind
+    if: always()       # Läuft auch wenn einzelne Jobs fehlschlugen
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Alle Score-Artifacts herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          pattern: score-*
+          path: ./scores
+
+      - name: results.json aktualisieren
+        run: |
           python3 - <<EOF
-          import json
-          with open("docs/results.json") as f:
+          import json, os, glob
+
+          # Bestehende Resultate laden
+          results_path = "docs/results.json"
+          with open(results_path) as f:
               data = json.load(f)
-          data.append({
-              "date": "$DATE",
-              "page": "${{ matrix.name }}",
-              "performance": $PERF,
-              "accessibility": $ACC,
-              "seo": $SEO,
-              "best_practices": $BP
-          })
-          with open("docs/results.json", "w") as f:
+
+          # Neue Scores hinzufügen
+          for file in glob.glob("scores/score-*/*.json"):
+              with open(file) as f:
+                  data.append(json.load(f))
+
+          with open(results_path, "w") as f:
               json.dump(data, f, indent=2)
+
+          print(f"Gesamt Einträge: {len(data)}")
           EOF
 
-      - name: Commit results
+      - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add docs/results.json
-          git commit -m "Lighthouse scores ${{ matrix.name }} $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
+          git commit -m "Lighthouse scores $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
           git push
