@@ -44,20 +44,23 @@ jobs:
         run: |
           lighthouse "${{ matrix.url }}" \
             --output json \
-            --output-path ./lighthouse-report \
+            --output-path ./report.json \
             --chrome-path=$(which chromium-browser) \
             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu" \
             --quiet
 
+      - name: Prüfe ob Report existiert
+        run: ls -la *.json
+
       - name: Score als Artifact speichern
         run: |
           DATE=$(date +'%Y-%m-%d')
-          PERF=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['performance']['score']*100))")
-          ACC=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['accessibility']['score']*100))")
-          SEO=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['seo']['score']*100))")
-          BP=$(python3 -c "import json; d=json.load(open('lighthouse-report.json')); print(int(d['categories']['best-practices']['score']*100))")
-
+          PERF=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['performance']['score']*100))")
+          ACC=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['accessibility']['score']*100))")
+          SEO=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['seo']['score']*100))")
+          BP=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['best-practices']['score']*100))")
           echo "{\"date\":\"$DATE\",\"page\":\"${{ matrix.name }}\",\"performance\":$PERF,\"accessibility\":$ACC,\"seo\":$SEO,\"best_practices\":$BP}" > score-${{ matrix.name }}.json
+          cat score-${{ matrix.name }}.json
 
       - name: Artifact hochladen
         uses: actions/upload-artifact@v4
@@ -82,17 +85,17 @@ jobs:
       - name: results.json aktualisieren
         run: |
           python3 - <<EOF
-          import json, os, glob
+          import json, glob
 
-          results_path = "docs/results.json"
-          with open(results_path) as f:
+          with open("docs/results.json") as f:
               data = json.load(f)
 
           for file in glob.glob("scores/score-*/*.json"):
+              print(f"Lese: {file}")
               with open(file) as f:
                   data.append(json.load(f))
 
-          with open(results_path, "w") as f:
+          with open("docs/results.json", "w") as f:
               json.dump(data, f, indent=2)
 
           print(f"Gesamt Einträge: {len(data)}")
