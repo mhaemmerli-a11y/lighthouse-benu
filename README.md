@@ -4,8 +4,10 @@ Link zum Dashboard: https://mhaemmerli-a11y.github.io/lighthouse-benu/
 
 Workflow-Run startet täglicher Lighthouse Test un um 20h. 
 
-Getestete Seiten:
+Getestete Seiten
+
 include:
+
 name: Home: url: https://www.benu.ch/
 name: Editorial: url: https://www.benu.ch/e/flohsamen-das-kleine-wundermittel-mit-grosser-wirkung
 name: Pharmacy: url: https://www.benu.ch/p/benu-luzern-bahnhof
