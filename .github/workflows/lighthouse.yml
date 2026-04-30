@@ -55,7 +55,7 @@ jobs:
 
       - name: Score als Artifact speichern
         run: |
-          DATE=$(date +'%Y-%m-%d')
+          DATE=$(date +'%Y-%m-%d %H:%M')
           PERF=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['performance']['score']*100))")
           ACC=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['accessibility']['score']*100))")
           SEO=$(python3 -c "import json; d=json.load(open('report.json')); print(int(d['categories']['seo']['score']*100))")
