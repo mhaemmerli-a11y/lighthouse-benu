@@ -98,10 +98,11 @@ jobs:
           print(f"Gesamt Einträge: {len(data)}")
           EOF
 
-      - name: Commit & Push
+- name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add docs/results.json
-          git commit -m "Lighthouse scores $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
+          git commit -m "Lighthouse scores $(date +'%Y-%m-%d %H:%M')" || echo "Keine Änderungen"
+          git pull --rebase origin main
           git push
