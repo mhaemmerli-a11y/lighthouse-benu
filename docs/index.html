@@ -30,7 +30,10 @@
       .then(data => {
         PAGES.forEach(page => {
           const pageData = data.filter(d => d.page === page);
-          const labels = pageData.map(d => d.date);
+          const labels = pageData.map(d => {
+            const parts = d.date.split(' ');
+            return parts.length > 1 ? parts[1] : parts[0]; // Zeigt nur Zeit wenn vorhanden
+          });
 
           const card = document.createElement("div");
           card.className = "card";
