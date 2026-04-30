@@ -1,8 +1,8 @@
-name: Daily Lighthouse Test
+name: Daily Lighthouse Test BENU
 
 on:
   schedule:
-- cron: '0 11 * * *'   # 13:00 Schweizer Sommerzeit (CEST)
+    - cron: '0 11 * * *'
   workflow_dispatch:
 
 permissions:
@@ -86,18 +86,14 @@ jobs:
         run: |
           python3 - <<EOF
           import json, glob
-
           with open("docs/results.json") as f:
               data = json.load(f)
-
           for file in glob.glob("scores/score-*/*.json"):
               print(f"Lese: {file}")
               with open(file) as f:
                   data.append(json.load(f))
-
           with open("docs/results.json", "w") as f:
               json.dump(data, f, indent=2)
-
           print(f"Gesamt Einträge: {len(data)}")
           EOF
 
