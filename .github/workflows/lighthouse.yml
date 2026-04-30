@@ -2,7 +2,7 @@ name: Daily Lighthouse Test
 
 on:
   schedule:
-    - cron: '0 13 * * *'
+- cron: '0 11 * * *'   # 13:00 Schweizer Sommerzeit (CEST)
   workflow_dispatch:
 
 permissions:
