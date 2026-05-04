@@ -678,5 +678,45 @@
     "accessibility": 96,
     "seo": 100,
     "best_practices": 75
+  },
+  {
+    "date": "2026-05-04 13:19",
+    "page": "Pharmacy",
+    "performance": 42,
+    "accessibility": 89,
+    "seo": 100,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-05-04 13:19",
+    "page": "Editorial",
+    "performance": 49,
+    "accessibility": 98,
+    "seo": 92,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-05-04 13:19",
+    "page": "Home",
+    "performance": 47,
+    "accessibility": 99,
+    "seo": 100,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-05-04 13:19",
+    "page": "Category",
+    "performance": 62,
+    "accessibility": 99,
+    "seo": 100,
+    "best_practices": 75
+  },
+  {
+    "date": "2026-05-04 13:19",
+    "page": "PDP",
+    "performance": 41,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 75
   }
 ]
