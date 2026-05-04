@@ -106,33 +106,3 @@ jobs:
           git add docs/results.json
           git commit -m "Lighthouse scores $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
           git push
-- name: Slack Notification
-  if: always()                # auch bei Failure feuern
-  uses: slackapi/slack-github-action@v2.1.1
-  with:
-    webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-    webhook-type: incoming-webhook
-    payload: |
-      text: "Workflow ${{ github.workflow }} – ${{ job.status }}"
-      blocks:
-        - type: "header"
-          text:
-            type: "plain_text"
-            text: "${{ job.status == 'success' && '✅' || '❌' }} ${{ github.workflow }}"
-        - type: "section"
-          fields:
-            - type: "mrkdwn"
-              text: "*Repo:*\n${{ github.repository }}"
-            - type: "mrkdwn"
-              text: "*Status:*\n${{ job.status }}"
-            - type: "mrkdwn"
-              text: "*Branch:*\n${{ github.ref_name }}"
-            - type: "mrkdwn"
-              text: "*Trigger:*\n${{ github.event_name }}"
-        - type: "actions"
-          elements:
-            - type: "button"
-              text:
-                type: "plain_text"
-                text: "Run ansehen"
-              url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
