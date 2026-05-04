@@ -2,9 +2,9 @@ name: Daily Lighthouse Test BENU
 
 on:
   schedule:
-    - cron: '0 09 * * *'
-    - cron: '0 11 * * *'
-    - cron: '0 18 * * *'
+    - cron: '0 06 * * *'
+    - cron: '0 10 * * *'
+    - cron: '0 16 * * *'
   workflow_dispatch:
 
 permissions:
